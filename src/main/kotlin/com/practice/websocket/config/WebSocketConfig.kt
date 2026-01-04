@@ -10,15 +10,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 // WebSocket + STOMP 기반 메시지 브로커 구조 사용
 class WebSocketConfig : WebSocketMessageBrokerConfigurer {
-    override fun configureMessageBroker(registry: MessageBrokerRegistry?) {
+    override fun configureMessageBroker(registry: MessageBrokerRegistry) {
         // 클라이언트가 구독하는 prefix
-        registry?.enableSimpleBroker("/topic")
+        registry.enableSimpleBroker("/topic")
 
         // 클라이언트가 서버로 보내는 prefix
-        registry?.setApplicationDestinationPrefixes("/app")
+        registry.setApplicationDestinationPrefixes("/app")
     }
 
-    override fun registerStompEndpoints(registry: StompEndpointRegistry?) {
-        registry?.addEndpoint("/ws")?.setAllowedOriginPatterns("*")
+    override fun registerStompEndpoints(registry: StompEndpointRegistry) {
+        registry.addEndpoint("/ws")?.setAllowedOriginPatterns("*")?.withSockJS()
     }
 }

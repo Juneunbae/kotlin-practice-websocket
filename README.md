@@ -19,10 +19,14 @@
 - 반면, STOMP는 WebSocket 연결 위에서 메시지를 전송하는 프로토콜로 메시지의 형식과 라우팅을 정의
 
 
-  ![img.png](img.png)
+  ![img.png](img/img.png)
   
 ## 차이점
 ### 프로토콜의 목적
 - WebSocket은 연결을 유지하고 양방향 통신을 가능하게 하는 프로토콜
 - STOMP는 WebSocket 위에서 메시지를 전송하기 위한 프로토콜
   (STOMP는 PUB/SUB 구조로 작동하며 경로 지정이 가능하고 메시지 세부사항을 명확하게 정의해줄 수 있다)
+
+## 결과
+![a.png](img/a.png)
+![b.png](img/b.png)

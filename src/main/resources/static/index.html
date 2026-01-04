@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<div>
+    roomId: <input id="room" value="room1"/>
+    nick: <input id="nick" value="eunbae"/>
+    <button onclick="connect()">connect</button>
+</div>
+
+<div style="margin-top:12px;">
+    message: <input id="msg" />
+    <button onclick="sendMsg()">send</button>
+</div>
+
+<pre id="log" style="margin-top:12px; border:1px solid #ccc; padding:12px;"></pre>
+
+<script>
+    let stompClient = null;
+
+    function log(s) {
+        document.getElementById("log").textContent += s + "\n";
+    }
+
+    function connect() {
+        const roomId = document.getElementById("room").value;
+        const nickname = document.getElementById("nick").value;
+
+        const socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+
+        // 디버그 로그 (브라우저 콘솔에 STOMP 프레임 찍힘)
+        stompClient.debug = (str) => console.log(str);
+
+        stompClient.connect(
+            { roomId: roomId, nickname: nickname },   // ✅ CONNECT 헤더 추가
+            () => {
+                stompClient.subscribe("/topic/rooms/" + roomId, (frame) => {
+                    const msg = JSON.parse(frame.body);
+
+                    const time = msg.sendAt
+                        ? new Date(msg.sendAt).toLocaleString()
+                        : "-";
+
+                    log(`${msg.sender} : ${msg.message} : ${time}`);
+                });
+                log("connected to room=" + roomId + ", nickname=" + nickname);
+            },
+            (err) => {
+                console.error(err);
+                log("connect error: " + err);
+            }
+        );
+    }
+
+    function sendMsg() {
+        if (!stompClient || !stompClient.connected) {
+            log("not connected");
+            return;
+        }
+
+        const roomId = document.getElementById("room").value;
+        const sender = document.getElementById("nick").value;
+        const message = document.getElementById("msg").value;
+
+        stompClient.send("/app/chat.send", {}, JSON.stringify({ roomId, sender, message }));
+    }
+</script>
+
+</body>
+</html>
